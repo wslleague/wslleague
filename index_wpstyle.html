@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2025 Fall WSL Men’s Over 30</title>
+<style>
+  :root {
+    --accent:#e11d48;
+    --ink:#111;
+    --muted:#6b7280;
+    --card:#ffffff;
+    --line:#e5e7eb;
+    --bg:#fafafa;
+  }
+  * { box-sizing:border-box }
+  body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--ink) }
+  .hidden { display:none !important; }
+  .container { max-width:1200px; margin:0 auto; padding:20px }
+  .title { font-size:42px; font-weight:900; color:var(--accent); line-height:1.05; margin:10px 0 8px }
+  .brand { display:flex; align-items:center; gap:15px; }
+  .logo { height:65px; width:auto; transition:transform .15s ease, filter .15s ease; }
+  .logo:hover { transform:scale(1.03); filter:brightness(1.05); }
+  .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap }
+  .toolbar .spacer { margin-left:auto; }
+  .pill, .btn { padding:8px 12px; border-radius:8px; border:1px solid var(--line); background:#fff; cursor:pointer }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; margin:18px 0 }
+  .card h3 { margin:0; padding:12px 14px; font-size:20px; font-weight:700 }
+  table { width:100%; border-collapse:collapse }
+  th { background:#111; color:#fff; text-align:left; padding:10px; font-weight:700 }
+  td { padding:10px; border-bottom:1px solid var(--line) }
+  .right { text-align:right }
+  .pos { width:56px }
+  .muted { color:var(--muted); font-size:13px; padding:8px 14px }
+  .small { font-size:12px; color:var(--muted) }
+  #status { margin-left:8px; font-size:12px; color:var(--muted) }
+  .group { background:#f8fafc; border-top:1px solid var(--line); font-weight:700; }
+  .schedule-date { padding:10px 14px; color:#111; }
+  .match-row td { padding:10px 14px; }
+  #splash {
+    position: fixed; inset: 0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; background:#e11d48; z-index:9999; transition:opacity .3s ease;
+  }
+  #splash.hide { opacity:0; pointer-events:none; visibility:hidden; }
+  #splash img { width:120px; height:120px; object-fit:contain; }
+  #splash h1 { color:#fff; margin:0; font-size:22px; font-weight:800; letter-spacing:.3px; text-align:center; }
+</style>
+</head>
+<body>
+<div id="splash">
+  <img src="Bradford Wolves Logo.png" alt="Club logo">
+  <h1>2025 Fall WSL Men’s Over 30</h1>
+</div>
+
+  <div class="container">
+    <div class="brand">
+      <a href="https://www.bradfordwolves.com/" target="_blank" rel="noopener">
+        <img class="logo" src="Bradford Wolves Logo.png" alt="Bradford Wolves FC logo">
+      </a>
+      <div class="title">2025 Fall WSL Men’s Over 30</div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn" id="btnStandings">Standings</button>
+      <button class="pill" id="btnTue">Tuesdays</button>
+      <button class="pill" id="btnThu">Thursdays</button>
+      <span class="spacer"></span>
+      <button class="btn" id="btnRefresh">Refresh</button>
+      <button class="btn" id="btnInstall" style="display:none">Install App</button>
+      <span id="status">loading…</span>
+    </div>
+
+    <div id="viewStandings">
+      <div class="card">
+        <h3>Mens Over 30 — Tuesday — League Standings</h3>
+        <table id="standTue">
+          <thead>
+            <tr>
+              <th class="pos">Pos</th><th>Club</th><th class="right">P</th><th class="right">W</th><th class="right">D</th><th class="right">L</th><th class="right">F</th><th class="right">A</th><th class="right">GD</th><th class="right">Pts</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Mens Over 30 — Thursday — League Standings</h3>
+        <table id="standThu">
+          <thead>
+            <tr>
+              <th class="pos">Pos</th><th>Club</th><th class="right">P</th><th class="right">W</th><th class="right">D</th><th class="right">L</th><th class="right">F</th><th class="right">A</th><th class="right">GD</th><th class="right">Pts</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="viewTue" class="hidden">
+      <div class="card">
+        <h3>Mens Over 30 — Tuesday — League Standings</h3>
+        <table id="standTblTue">
+          <thead>
+            <tr>
+              <th class="pos">Pos</th><th>Club</th><th class="right">P</th><th class="right">W</th><th class="right">D</th><th class="right">L</th><th class="right">F</th><th class="right">A</th><th class="right">GD</th><th class="right">Pts</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Mens Over 30 — Tuesday — Top Players</h3>
+        <table id="topTblTue">
+          <thead>
+            <tr><th>Player</th><th>Club</th><th class="right">Goals</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Mens Over 30 — Tuesday — Full Schedule</h3>
+        <div class="small muted">Grouped by week, then Field 1–3</div>
+        <table id="schedTblTue">
+          <thead>
+            <tr><th>Field</th><th>Time</th><th colspan="2">Match</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="viewThu" class="hidden">
+      <div class="card">
+        <h3>Mens Over 30 — Thursday — League Standings</h3>
+        <table id="standTblThu">
+          <thead>
+            <tr>
+              <th class="pos">Pos</th><th>Club</th><th class="right">P</th><th class="right">W</th><th class="right">D</th><th class="right">L</th><th class="right">F</th><th class="right">A</th><th class="right">GD</th><th class="right">Pts</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Mens Over 30 — Thursday — Top Players</h3>
+        <table id="topTblThu">
+          <thead>
+            <tr><th>Player</th><th>Club</th><th class="right">Goals</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Mens Over 30 — Thursday — Full Schedule</h3>
+        <div class="small muted">Grouped by week, then Field 1–3</div>
+        <table id="schedTblThu">
+          <thead>
+            <tr><th>Field</th><th>Time</th><th colspan="2">Match</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+const STATUS = document.getElementById('status');
+let DATA = {teams:[], matches:[]};
+
+function capWord(w){ if(!w) return w; return w.split('-').map(p=>p? p[0].toUpperCase()+p.slice(1).toLowerCase():p).join('-'); }
+function titleCaseName(s){ if(!s) return s; return String(s).trim().split(/\s+/).map(capWord).join(' '); }
+function normalizeTeamName(name){
+  if(!name) return name;
+  let s=String(name).trim().replace(/\s+/g,' ');
+  const hadFC=/\bfc\b/i.test(s);
+  s=s.replace(/\bfc\b\.?/gi,'').replace(/\s+/g,' ').trim();
+  s=s.split(' ').map(w=>/^(?:o?35)$/i.test(w)?'O35':(w?w[0].toUpperCase()+w.slice(1).toLowerCase():w)).join(' ');
+  if(hadFC && !/\bFC$/.test(s)) s+=' FC';
+  return s;
+}
+function normalizeAllData(){ (DATA.teams||[]).forEach(t=>t.name=normalizeTeamName(t.name)); (DATA.matches||[]).forEach(m=>{ m.home=normalizeTeamName(m.home); m.away=normalizeTeamName(m.away); }); }
+
+function intOrNull(v){ const n=parseInt(v,10); return isNaN(n)?null:n; }
+function parseGoalList(s){ const out=[]; (s||'').split(';').map(x=>x.trim()).filter(Boolean).forEach(item=>{ const m=item.match(/^(.+?)\s*x(\d+)$/i); if(m) out.push([titleCaseName(m[1].trim()), parseInt(m[2],10)]); else out.push([titleCaseName(item.trim()),1]); }); return out; }
+
+function calcStandings(day){
+  const teams=new Set((DATA.teams||[]).filter(t=>t.division===day).map(t=>t.name));
+  const table={}; teams.forEach(n=>table[n]={team:n,GP:0,W:0,D:0,L:0,GF:0,GA:0,GD:0,Pts:0});
+  for(const m of (DATA.matches||[])){
+    if(m.division!==day) continue;
+    const hs=intOrNull(m.home_score), as=intOrNull(m.away_score);
+    if(hs==null||as==null) continue;
+    const H=table[m.home], A=table[m.away]; if(!H||!A) continue;
+    H.GP++; A.GP++; H.GF+=hs; H.GA+=as; A.GF+=as; A.GA+=hs;
+    if(hs>as){ H.W++; A.L++; H.Pts+=3; }
+    else if(hs<as){ A.W++; H.L++; A.Pts+=3; }
+    else { H.D++; A.D++; H.Pts++; A.Pts++; }
+  }
+  Object.values(table).forEach(t=>t.GD=t.GF-t.GA);
+  return Object.values(table).sort((a,b)=> b.Pts-a.Pts || b.GD-a.GD || b.GF-a.GF || a.team.localeCompare(b.team));
+}
+
+function calcScorers(day){
+  const map=new Map(); const add=(k,v)=>map.set(k,(map.get(k)||0)+v);
+  const key=(p,t)=>p.trim()?p.trim()+"|"+t:"";
+  for(const m of (DATA.matches||[])){
+    if(m.division!==day) continue;
+    for(const [p,g] of parseGoalList(m.home_goals)) { const k=key(p,normalizeTeamName(m.home)); if(k) add(k,g); }
+    for(const [p,g] of parseGoalList(m.away_goals)) { const k=key(p,normalizeTeamName(m.away)); if(k) add(k,g); }
+  }
+  return Array.from(map.entries()).map(([k,g])=>{ const [p,t]=k.split('|'); return {player:p, team:t, goals:g}; })
+    .sort((a,b)=> b.goals-a.goals || a.player.localeCompare(b.player));
+}
+
+function renderSchedule(day, tblId){
+  const tbody = document.querySelector('#'+tblId+' tbody');
+  const rows = (DATA.matches||[]).filter(m=>m.division===day)
+               .sort((a,b)=> a.date.localeCompare(b.date) || (parseInt(a.field||'0')-parseInt(b.field||'0')));
+  if(!rows.length){ tbody.innerHTML = '<tr><td colspan="4" class="muted">No fixtures available.</td></tr>'; return; }
+
+  const dates = Array.from(new Set(rows.map(r=>r.date))).sort();
+  const weekMap = new Map(dates.map((d,i)=>[d, i+1]));
+
+  let out=''; let currentWeek=null;
+  for(const m of rows){
+    const wk = weekMap.get(m.date) || 0;
+    if(wk !== currentWeek){ currentWeek = wk; out += `<tr class="group"><td colspan="4" class="schedule-date">Week ${wk}</td></tr>`; }
+    const field = m.field ? `Field ${m.field}` : '';
+    const time  = m.time || '10:00 PM';
+    out += `<tr class="match-row"><td>${field}</td><td>${time}</td><td colspan="2">${m.home} vs ${m.away}</td></tr>`;
+  }
+  tbody.innerHTML = out;
+}
+
+const qs = s => document.querySelector(s);
+function renderLanding(){
+  const tue=calcStandings('Tuesday');
+  qs('#standTue tbody').innerHTML = tue.map((r,i)=>`
+    <tr><td class="pos">${i+1}</td><td>${r.team}</td>
+        <td class="right">${r.GP}</td><td class="right">${r.W}</td><td class="right">${r.D}</td><td class="right">${r.L}</td>
+        <td class="right">${r.GF}</td><td class="right">${r.GA}</td><td class="right">${r.GD}</td><td class="right">${r.Pts}</td></tr>`
+  ).join('') || `<tr><td colspan="10" class="muted">No results yet.</td></tr>`;
+
+  const thu=calcStandings('Thursday');
+  qs('#standThu tbody').innerHTML = thu.map((r,i)=>`
+    <tr><td class="pos">${i+1}</td><td>${r.team}</td>
+        <td class="right">${r.GP}</td><td class="right">${r.W}</td><td class="right">${r.D}</td><td class="right">${r.L}</td>
+        <td class="right">${r.GF}</td><td class="right">${r.GA}</td><td class="right">${r.GD}</td><td class="right">${r.Pts}</td></tr>`
+  ).join('') || `<tr><td colspan="10" class="muted">No results yet.</td></tr>`;
+}
+
+function renderTue(){
+  const s=calcStandings('Tuesday');
+  qs('#standTblTue tbody').innerHTML = s.map((r,i)=>`
+    <tr><td class="pos">${i+1}</td><td>${r.team}</td>
+        <td class="right">${r.GP}</td><td class="right">${r.W}</td><td class="right">${r.D}</td><td class="right">${r.L}</td>
+        <td class="right">${r.GF}</td><td class="right">${r.GA}</td><td class="right">${r.GD}</td><td class="right">${r.Pts}</td></tr>`
+  ).join('') || `<tr><td colspan="10" class="muted">No results yet.</td></tr>`;
+  const top=calcScorers('Tuesday');
+  qs('#topTblTue tbody').innerHTML = top.map(r=>`<tr><td>${r.player}</td><td>${r.team}</td><td class="right">${r.goals}</td></tr>`).join('') || `<tr><td colspan="3" class="muted">No goals recorded yet.</td></tr>`;
+  renderSchedule('Tuesday','schedTblTue');
+}
+
+function renderThu(){
+  const s=calcStandings('Thursday');
+  qs('#standTblThu tbody').innerHTML = s.map((r,i)=>`
+    <tr><td class="pos">${i+1}</td><td>${r.team}</td>
+        <td class="right">${r.GP}</td><td class="right">${r.W}</td><td class="right">${r.D}</td><td class="right">${r.L}</td>
+        <td class="right">${r.GF}</td><td class="right">${r.GA}</td><td class="right">${r.GD}</td><td class="right">${r.Pts}</td></tr>`
+  ).join('') || `<tr><td colspan="10" class="muted">No results yet.</td></tr>`;
+  const top=calcScorers('Thursday');
+  qs('#topTblThu tbody').innerHTML = top.map(r=>`<tr><td>${r.player}</td><td>${r.team}</td><td class="right">${r.goals}</td></tr>`).join('') || `<tr><td colspan="3" class="muted">No goals recorded yet.</td></tr>`;
+  renderSchedule('Thursday','schedTblThu');
+}
+
+async function fetchData(){
+  const src = "https://wslleague.github.io/wsl-league-data/league_report_data.json" + '?v=' + Date.now();
+  STATUS.textContent = "loading…";
+  try{
+    const res = await fetch(src, {cache:'no-store'});
+    if(!res.ok) throw new Error(res.status + ' ' + res.statusText);
+    const obj = await res.json();
+    if(!obj || !obj.matches || !obj.teams) throw new Error('Invalid data format');
+    DATA = obj;
+    normalizeAllData();
+    renderLanding();
+    if(!document.getElementById('viewTue').classList.contains('hidden')) renderTue();
+    if(!document.getElementById('viewThu').classList.contains('hidden')) renderThu();
+    STATUS.textContent = "updated " + new Date().toLocaleString();
+  }catch(e){
+    console.error(e);
+    STATUS.textContent = "failed to load data";
+  } finally {
+    const sp = document.getElementById('splash'); if(sp) sp.classList.add('hide');
+  }
+}
+
+function show(viewId){
+  document.getElementById('viewStandings').classList.add('hidden');
+  document.getElementById('viewTue').classList.add('hidden');
+  document.getElementById('viewThu').classList.add('hidden');
+  document.getElementById(viewId).classList.remove('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  show('viewStandings');
+  fetchData();
+  setInterval(fetchData, 5*60*1000);
+
+  document.getElementById('btnStandings').onclick = ()=> show('viewStandings');
+  document.getElementById('btnTue').onclick = ()=>{ show('viewTue'); renderTue(); };
+  document.getElementById('btnThu').onclick = ()=>{ show('viewThu'); renderThu(); };
+  document.getElementById('btnRefresh').onclick = fetchData;
+
+  (function(){
+    let deferredPrompt=null;
+    const btn=document.getElementById('btnInstall');
+    const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone=window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
+    function showInstallButton(){ if(btn) btn.style.display='inline-block'; }
+    window.addEventListener('beforeinstallprompt',(e)=>{ e.preventDefault(); deferredPrompt=e; showInstallButton(); });
+    document.addEventListener('DOMContentLoaded',()=>{ if(isStandalone){btn&& (btn.style.display='none'); return;} if(isIos) showInstallButton(); });
+    btn && btn.addEventListener('click', async ()=>{ if(isIos){ alert('On iPhone: Share → Add to Home Screen'); return; } if(deferredPrompt){ deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; } else { alert('If you see an Install icon in your address bar, tap it to install.'); } });
+  })();
+
+  setTimeout(()=>{ const sp=document.getElementById('splash'); if(sp) sp.classList.add('hide'); }, 3500);
+});
+</script>
+</body>
+</html>
